@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Atmos — Weather Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===== CUSTOM CURSOR ===== -->
+  <div class="cursor-glow" id="cursorGlow"></div>
+
+  <!-- ===== ANIMATED BACKGROUND ===== -->
+  <div class="bg-canvas" id="bgCanvas">
+    <div class="blob blob-1" id="blob1"></div>
+    <div class="blob blob-2" id="blob2"></div>
+    <div class="blob blob-3" id="blob3"></div>
+    <div class="particles-container" id="particles"></div>
+  </div>
+
+  <!-- ===== MAIN APP WRAPPER ===== -->
+  <main class="app-wrapper" id="appWrapper">
+
+    <!-- ===== HEADER ===== -->
+    <header class="app-header">
+      <div class="logo">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">Atmos</span>
+      </div>
+      <div class="header-right">
+        <!-- Real-time clock -->
+        <div class="live-clock">
+          <span class="clock-time" id="clockTime">--:--:--</span>
+          <span class="clock-date" id="clockDate">--- --, ----</span>
+        </div>
+        <!-- Temperature unit toggle -->
+        <div class="unit-toggle" id="unitToggle" title="Toggle °C / °F">
+          <span class="unit-label active" id="labelC">°C</span>
+          <div class="toggle-track">
+            <div class="toggle-thumb"></div>
+          </div>
+          <span class="unit-label" id="labelF">°F</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== SEARCH SECTION ===== -->
+    <section class="search-section" aria-label="Search weather by city">
+      <div class="search-container">
+        <div class="search-bar glass-card" id="searchBar">
+          <span class="search-icon">⌕</span>
+          <input
+            type="text"
+            id="cityInput"
+            placeholder="Search any city worldwide..."
+            autocomplete="off"
+            aria-label="Enter city name"
+          />
+          <button class="search-btn" id="searchBtn" aria-label="Search">
+            <span>Search</span>
+          </button>
+          <button class="locate-btn" id="locateBtn" title="Use my location" aria-label="Detect my location">
+            <span class="locate-icon">◎</span>
+          </button>
+        </div>
+
+        <!-- Recent searches -->
+        <div class="history-strip" id="historyStrip" aria-label="Recent searches">
+          <span class="history-label">Recent:</span>
+          <div class="history-chips" id="historyChips"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== LOADING SKELETON ===== -->
+    <div class="skeleton-wrapper" id="skeletonWrapper" hidden>
+      <div class="skeleton-card glass-card">
+        <div class="sk-line sk-city"></div>
+        <div class="sk-temp"></div>
+        <div class="sk-line sk-condition"></div>
+        <div class="sk-grid">
+          <div class="sk-box"></div>
+          <div class="sk-box"></div>
+          <div class="sk-box"></div>
+          <div class="sk-box"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ERROR POPUP ===== -->
+    <div class="error-popup glass-card" id="errorPopup" role="alert" aria-live="polite">
+      <span class="error-icon">⚠</span>
+      <span class="error-msg" id="errorMsg">City not found. Try again.</span>
+      <button class="error-close" id="errorClose" aria-label="Dismiss">✕</button>
+    </div>
+
+    <!-- ===== WEATHER DASHBOARD ===== -->
+    <section class="weather-dashboard" id="weatherDashboard" hidden aria-label="Weather information">
+
+      <!-- Main weather card -->
+      <article class="weather-card glass-card" id="weatherCard">
+
+        <!-- Top: City + condition -->
+        <div class="card-top">
+          <div class="city-info">
+            <h1 class="city-name" id="cityName">--</h1>
+            <p class="city-meta" id="cityMeta">--, --</p>
+          </div>
+          <div class="condition-badge" id="conditionBadge">
+            <span id="conditionText">--</span>
+          </div>
+        </div>
+
+        <!-- Center: Big temperature + icon -->
+        <div class="card-center">
+          <div class="weather-icon-wrap" id="weatherIconWrap">
+            <span class="weather-icon-main" id="weatherIconMain" aria-hidden="true">🌤</span>
+          </div>
+          <div class="temp-display">
+            <span class="temp-value" id="tempValue">--</span>
+            <span class="temp-unit" id="tempUnit">°C</span>
+          </div>
+        </div>
+
+        <!-- Feels like + mood -->
+        <div class="card-sub">
+          <span class="feels-like">Feels like <strong id="feelsLike">--</strong></span>
+          <span class="mood-text" id="moodText">Loading weather mood...</span>
+        </div>
+
+        <!-- Details grid -->
+        <div class="details-grid" role="list">
+          <div class="detail-item" role="listitem">
+            <span class="detail-icon" aria-hidden="true">💧</span>
+            <span class="detail-label">Humidity</span>
+            <span class="detail-value" id="humidity">--%</span>
+          </div>
+          <div class="detail-item" role="listitem">
+            <span class="detail-icon" aria-hidden="true">💨</span>
+            <span class="detail-label">Wind</span>
+            <span class="detail-value" id="windSpeed">-- km/h</span>
+          </div>
+          <div class="detail-item" role="listitem">
+            <span class="detail-icon" aria-hidden="true">🌅</span>
+            <span class="detail-label">Sunrise</span>
+            <span class="detail-value" id="sunrise">--:--</span>
+          </div>
+          <div class="detail-item" role="listitem">
+            <span class="detail-icon" aria-hidden="true">🌇</span>
+            <span class="detail-label">Sunset</span>
+            <span class="detail-value" id="sunset">--:--</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 5-Day Forecast strip -->
+      <aside class="forecast-panel glass-card" aria-label="5-day forecast">
+        <h2 class="panel-title">5-Day Forecast</h2>
+        <div class="forecast-list" id="forecastList" role="list"></div>
+      </aside>
+
+    </section>
+
+    <!-- ===== WELCOME STATE ===== -->
+    <div class="welcome-state" id="welcomeState">
+      <div class="welcome-icon pulse-anim" aria-hidden="true">🌍</div>
+      <h2 class="welcome-title">Weather Intelligence</h2>
+      <p class="welcome-sub">Search a city or allow location access to see live weather data, forecasts, and more.</p>
+    </div>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="app-footer">
+    <span>Powered by <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo API</a> &amp; <a href="https://nominatim.openstreetmap.org" target="_blank" rel="noopener">Nominatim</a></span>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
