@@ -627,6 +627,7 @@ a, button, input, [role="button"] {
   display: flex;
   flex-direction: column;
   gap: var(--gap-xl);
+  animation: fadeSlideUp 0.8s ease;
 }
 
 /* Card top row */
