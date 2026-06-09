@@ -412,6 +412,8 @@ a, button, input, [role="button"] {
   border-radius: var(--r-lg);
   padding: 0.55rem 1.25rem;
   letter-spacing: 0.02em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   transition:
     transform var(--t-fast) var(--ease-spring),
     box-shadow var(--t-fast),
